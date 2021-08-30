@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="custom_presets">
+        <item>@style/CustomPresetStyle1</item>
+    </array>
+    <string-array name="stickynote_icons">
+        <item>Comment</item>
+    </string-array>
+</resources>
