@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="CustomPDFTronAppTheme" parent="PDFTronThemeBase">
+    <style name="CustomPDFTronAppTheme" parent="PDFTronAppTheme">
         <item name="pt_bottom_bar_style">@style/BottomBarTheme</item>
-        <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonNavigationStyle</item>
         <item name="pt_toolbar_switcher_button_style">@style/ToolbarSwitcherButtonTheme</item>
         <item name="pt_toolbar_style">@style/ToolbarStyle</item>
         <item name="pt_annotation_toolbar_style">@style/AnnotationToolbarTheme</item>
-        <item name="actionOverflowButtonStyle">@style/ActionModeOverflowButtonStyle</item>
         <item name="pt_toolbar_theme">@style/ToolbarTheme</item>
+        <item name="pt_toolbar_popup_theme">@style/ToolbarPopupTheme</item>
+        <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonNavigationStyle</item>
+        <item name="actionOverflowButtonStyle">@style/ActionModeOverflowButtonStyle</item>
+        <item name="actionMenuTextColor">@color/neutral_60</item>
         <item name="custom_bookmarks_tab_layout">@style/BookmarksTabLayoutStyle</item>
         <item name="sticky_note_presets">@array/custom_presets</item>
     </style>
-    <style name="PDFTronAppTheme" parent="PDFTronAppThemeBase">
+     <style name="PDFTronAppTheme" parent="PDFTronAppThemeBase">
         <item name="colorPrimary">@color/white</item>
         <item name="colorAccent">@color/color_secondary</item>
-        <item name="android:textViewStyle">@style/defaultTextViewStyle</item>
-        <item name="windowActionModeOverlay">true</item>
-		</style>
-    <style name="defaultTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/axiforma_medium</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
+    <style name="ToolbarPopupTheme" parent="ThemeOverlay.AppCompat.Light" />
     <style name="CustomPresetStyle1">
         <item name="annot_color">@color/yellow</item>
         <item name="annot_icon">Comment</item>
@@ -30,7 +30,6 @@
         <item name="backgroundColor">@color/white</item>
         <item name="selectedItemBackgroundColor">@color/neutral_20</item>
         <item name="selectedIconColor">@color/color_secondary</item>
-        <item name="android:fontFamily">@font/axiforma_medium</item>
     </style>
     <style name="BookmarksTabLayoutStyle" parent="BaseBookmarksTabLayoutStyle">
         <item name="tabBackgroundDialog">@color/white</item>
@@ -42,10 +41,9 @@
         <item name="titleTextColor">@color/neutral_60</item>
         <item name="colorControlNormal">@color/neutral_60</item>
         <item name="iconTint">@color/neutral_60</item>
-        <!--Search-->
+        <!--Search box config-->
         <item name="android:editTextColor">@color/neutral_60</item>
         <item name="android:textColorHint">@color/neutral_60</item>
-        <item name="android:fontFamily">@font/axiforma_medium</item>
     </style>
     <style name="ActionModeOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/neutral_60</item>
@@ -55,7 +53,6 @@
         <item name="iconColor">@color/neutral_60</item>
         <item name="dividerColor">@color/neutral_60</item>
         <item name="textColor">@color/color_primary</item>
-        <item name="disabledIconColor">@color/neutral_20</item>
     </style>
     <style name="ToolbarStyle">
         <item name="android:background">@color/white</item>

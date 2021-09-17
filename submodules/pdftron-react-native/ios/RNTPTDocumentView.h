@@ -272,6 +272,9 @@ static const PTAnnotationToolbarKey PTAnnotationToolbarKeyName = @"name";
 static const PTAnnotationToolbarKey PTAnnotationToolbarKeyIcon = @"icon";
 static const PTAnnotationToolbarKey PTAnnotationToolbarKeyItems = @"items";
 
+// To access the saved signatures folder
+static NSString * const PTSignaturesManager_signatureDirectory = @"PTSignaturesManager_signatureDirectory";
+
 @class RNTPTDocumentView;
 
 @protocol RNTPTDocumentViewDelegate <NSObject>
@@ -279,6 +282,7 @@ static const PTAnnotationToolbarKey PTAnnotationToolbarKeyItems = @"items";
 - (void)documentViewAttachedToWindow:(RNTPTDocumentView *)documentView;
 - (void)documentViewDetachedFromWindow:(RNTPTDocumentView *)documentView;
 
+- (void)commentHistoryPressed:(RNTPTDocumentView *)sender;
 - (void)navButtonClicked:(RNTPTDocumentView *)sender;
 - (void)documentLoaded:(RNTPTDocumentView *)sender;
 - (void)documentError:(RNTPTDocumentView *)sender error:(nullable NSString *)error;
@@ -613,6 +617,10 @@ static const PTAnnotationToolbarKey PTAnnotationToolbarKeyItems = @"items";
 - (void)shareCopyfromRect:(NSDictionary *)rect withFlattening:(BOOL)flattening;
 
 - (void)openThumbnailsView;
+
+-(NSArray *)getSavedSignatures;
+
+-(NSString *)getSavedSignatureFolder;
 
 @end
 

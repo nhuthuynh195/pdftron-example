@@ -7,6 +7,8 @@
 
 #include <objc/runtime.h>
 
+
+
 static BOOL RNTPT_addMethod(Class cls, SEL selector, void (^block)(id))
 {
     const IMP implementation = imp_implementationWithBlock(block);
@@ -21,6 +23,25 @@ static BOOL RNTPT_addMethod(Class cls, SEL selector, void (^block)(id))
 }
 
 NS_ASSUME_NONNULL_BEGIN
+@interface AnnotationsModeController : PTToolGroupViewController
+
+@end
+
+@implementation AnnotationsModeController
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    UIFont *defaultFont = [UIFont fontWithName:@"Axiforma-Regular" size:18.0];
+//    [defaultFont fontWithSize:25];
+    UIColor *defaultColor = [UIColor colorWithRed:97/255.0f green:130/255.0f blue:152/255.0f alpha:1.0f];
+    
+    cell.textLabel.textColor = defaultColor;
+    cell.textLabel.font = defaultFont;
+    
+    return cell;
+}
+
+@end
 
 @interface RNTPTDocumentView () <PTTabbedDocumentViewControllerDelegate, RNTPTDocumentViewControllerDelegate, RNTPTDocumentControllerDelegate, PTCollaborationServerCommunication, RNTPTNavigationControllerDelegate, PTBookmarkViewControllerDelegate>
 
@@ -88,6 +109,8 @@ NS_ASSUME_NONNULL_END
                      withClass:[RNTPTThumbnailsViewController class]];
     
     _tempFilePaths = [[NSMutableArray alloc] init];
+    
+    _showSavedSignatures = YES;
 }
 
 -(instancetype)initWithFrame:(CGRect)frame
@@ -131,6 +154,7 @@ NS_ASSUME_NONNULL_END
         [self unloadViewController];
     }
 }
+
 
 #pragma mark - Document Opening
 
@@ -259,6 +283,8 @@ NS_ASSUME_NONNULL_END
         
     UIView *controllerView = navigationController.view;
     
+    [PTOverrides overrideClass:[PTToolGroupViewController class] withClass:[AnnotationsModeController class]];
+    
     // View controller containment.
     [parentController addChildViewController:navigationController];
     
@@ -285,8 +311,12 @@ NS_ASSUME_NONNULL_END
                                                  UIUserInterfaceStyleLight);
         }
     }
+
     
     // Custom navigation list items
+    // comment history button
+    
+
     // search button
     UIImage *searchIcon = [UIImage imageNamed:@"basic_search"];
     UIButton *searchButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -295,25 +325,16 @@ NS_ASSUME_NONNULL_END
     [searchButton.widthAnchor constraintEqualToConstant:40].active = YES;
     [searchButton.heightAnchor constraintEqualToConstant:40].active = YES;
     UIBarButtonItem *newSearchButton = [[UIBarButtonItem alloc] initWithCustomView:searchButton];
-    // three dot butoon
-    UIImage *moreIcon = [UIImage imageNamed:@"basic_more_horizontal"];
 
-    UIBarButtonItem *newMoreButton = [[UIBarButtonItem alloc] initWithImage:moreIcon style:UIBarButtonItemStylePlain target:self action:self.documentViewController.moreItemsButtonItem.action];
-    [newMoreButton setTintColor:[UIColor colorWithRed:97/255.0f green:130/255.0f blue:152/255.0f alpha:1.0f]];
-    if (@available(iOS 14.0, *)) {
-        newMoreButton.action = nil;
-        newMoreButton.menu = self.documentViewController.moreItemsButtonItem.menu;
-    }
-    newMoreButton.target = self;
     NSMutableArray* rightItem = [self.documentViewController.navigationItem.rightBarButtonItems mutableCopy];
     
     NSUInteger indexSearchButton = [rightItem indexOfObject:self.documentViewController.searchButtonItem];
     [rightItem removeObject:self.documentViewController.searchButtonItem];
     [rightItem insertObject:newSearchButton atIndex:indexSearchButton];
     
-    NSUInteger indexMoreButton = [rightItem indexOfObject:self.documentViewController.moreItemsButtonItem];
+//    NSUInteger indexMoreButton = [rightItem indexOfObject:self.documentViewController.moreItemsButtonItem];
     [rightItem removeObject:self.documentViewController.moreItemsButtonItem];
-    [rightItem insertObject:newMoreButton atIndex:indexMoreButton];
+//    [rightItem insertObject:newMoreButton atIndex:indexMoreButton];
     self.documentViewController.navigationItem.rightBarButtonItems = [rightItem copy];
     
     NSMutableArray* bottomItems = [self.documentViewController.toolbarItems mutableCopy];
@@ -331,21 +352,30 @@ NS_ASSUME_NONNULL_END
     NSUInteger navigationListIndex = [bottomItems indexOfObject:self.documentViewController.navigationListsButtonItem];
     [bottomItems removeObject:self.documentViewController.navigationListsButtonItem];
     [bottomItems insertObject:newNavigationListButton atIndex:navigationListIndex];
+    self.documentViewController.toolbarItems = [bottomItems copy];
+    
+    [self applyCommentHistoryButton];
+    
+    self.documentViewController.readerModeButtonHidden = YES;
+    
+    PTDocumentController *myController = (PTDocumentController *)self.documentViewController;
+    myController.toolGroupIndicatorView.button.titleLabel.font = [UIFont systemFontOfSize:20.0f weight:UIFontWeightBold];
+    myController.toolGroupToolbar.backgroundColor = UIColor.whiteColor;
+    myController.toolGroupToolbar.shadowHidden = YES;
+//    myController.toolGroupManager.selectedGroup = myController.toolGroupManager.viewItemGroup;
+    
+    PTToolGroupManager *toolGroupManager = myController.toolGroupManager;
     
     
-    
-    
-    
+    toolGroupManager.undoButtonItem.image = [UIImage imageNamed:@"basic-undo"];
+    toolGroupManager.redoButtonItem.image = [UIImage imageNamed:@"basic-redo"];
     
     self.documentViewController.toolbarItems = [bottomItems copy];
     
     self.documentViewController.readerModeButtonHidden = YES;
     
-    PTDocumentController *myController = (PTDocumentController *)self.documentViewController;
-//    myController.toolGroupManager.selectedGroup = myController.toolGroupManager.viewItemGroup;
     
-    PTToolGroupManager *toolGroupManager = myController.toolGroupManager;
-    
+ 
     for (PTToolGroup *toolGroup in toolGroupManager.groups) {
         for (UIBarButtonItem *item in toolGroup.barButtonItems) {
             if ([item isKindOfClass:[PTToolBarButtonItem class]]) {
@@ -1948,6 +1978,9 @@ NS_ASSUME_NONNULL_END
     // Leading Nav Icon.
     [self applyLeadingNavButton];
     
+    // Comment list button
+    [self applyCommentHistoryButton];
+    
     // Thumbnail Filter Mode
     
     NSMutableArray <PTFilterMode>* filterModeArray = [[NSMutableArray alloc] init];
@@ -1990,6 +2023,18 @@ NS_ASSUME_NONNULL_END
     // Enable/disable restoring state (last read page).
     [NSUserDefaults.standardUserDefaults setBool:self.saveStateEnabled
                                           forKey:@"gotoLastPage"];
+}
+
+- (void)applyCommentHistoryButton
+{
+    NSLog(@"HELLO FROM APPLY");
+    UIBarButtonItem* commentHistory = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"comment-history"] style:UIBarButtonItemStylePlain target:self action:@selector(commentHistoryPressed)];
+    NSMutableArray* bottomItems = [self.documentViewController.toolbarItems mutableCopy];
+
+    [bottomItems addObject:commentHistory];
+    
+    self.documentViewController.toolbarItems = [bottomItems copy];
+
 }
 
 - (void)applyLeadingNavButton
@@ -2389,47 +2434,47 @@ NS_ASSUME_NONNULL_END
     NSMutableArray<UIBarButtonItem*>* defaultDrawGroupTools = [documentController.toolGroupManager.drawItemGroup.barButtonItems mutableCopy];
     NSMutableArray<UIBarButtonItem*>* newAnnotateGroupTools = [[NSMutableArray alloc] init];
     NSMutableArray<UIBarButtonItem*>* newDrawGroupTools = [[NSMutableArray alloc] init];
-    if (@available(iOS 13.1, *)) {
-        for(UIBarButtonItem* defaultToolItem in defaultAnnotateGroupTools)
+
+    for(UIBarButtonItem* defaultToolItem in defaultAnnotateGroupTools)
+    {
+        if( [defaultToolItem isKindOfClass:[PTToolBarButtonItem class]] )
         {
-            if( [defaultToolItem isKindOfClass:[PTToolBarButtonItem class]] )
+            PTToolBarButtonItem* toolBarButton = (PTToolBarButtonItem*)defaultToolItem;
+            if( toolBarButton.toolClass == [PTFreeHandCreate class] && documentController.toolManager.freehandUsesPencilKit)
             {
-                PTToolBarButtonItem* toolBarButton = (PTToolBarButtonItem*)defaultToolItem;
-                if( toolBarButton.toolClass == [PTFreeHandCreate class] && documentController.toolManager.freehandUsesPencilKit)
-                {
-                    continue;
-                }
-                else
-                {
-                    [newAnnotateGroupTools addObject:defaultToolItem];
-                }
+                continue;
             }
             else
             {
                 [newAnnotateGroupTools addObject:defaultToolItem];
             }
         }
-
-        for(UIBarButtonItem* defaultToolItem in defaultDrawGroupTools)
+        else
         {
-            if( [defaultToolItem isKindOfClass:[PTToolBarButtonItem class]] )
+            [newAnnotateGroupTools addObject:defaultToolItem];
+        }
+    }
+
+    for(UIBarButtonItem* defaultToolItem in defaultDrawGroupTools)
+    {
+        if( [defaultToolItem isKindOfClass:[PTToolBarButtonItem class]] )
+        {
+            PTToolBarButtonItem* toolBarButton = (PTToolBarButtonItem*)defaultToolItem;
+            if( toolBarButton.toolClass == [PTFreeHandCreate class] && documentController.toolManager.freehandUsesPencilKit)
             {
-                PTToolBarButtonItem* toolBarButton = (PTToolBarButtonItem*)defaultToolItem;
-                if( toolBarButton.toolClass == [PTFreeHandCreate class] && documentController.toolManager.freehandUsesPencilKit)
-                {
-                    continue;
-                }
-                else
-                {
-                    [newDrawGroupTools addObject:defaultToolItem];
-                }
+                continue;
             }
             else
             {
                 [newDrawGroupTools addObject:defaultToolItem];
             }
         }
-
+        else
+        {
+            [newDrawGroupTools addObject:defaultToolItem];
+        }
+    }
+    if (@available(iOS 13.1, *)) {
         if (documentController.toolManager.freehandUsesPencilKit) {
             UIBarButtonItem* pencilItem = [documentController.toolGroupManager createItemForToolClass:[PTPencilDrawingCreate class]];
             [newAnnotateGroupTools insertObject:pencilItem atIndex:2];
@@ -2545,13 +2590,42 @@ NS_ASSUME_NONNULL_END
     [self applyViewerSettings];
 }
 
-#pragma mark - Show saved signatures
+#pragma mark - Signatures
 
 - (void)setShowSavedSignatures:(BOOL)showSavedSignatures
 {
     _showSavedSignatures = showSavedSignatures;
     
     [self applyViewerSettings];
+}
+
+-(void)setSignSignatureFieldsWithStamps:(BOOL)signSignatureFieldsWithStamps
+{
+    _signSignatureFieldsWithStamps = signSignatureFieldsWithStamps;
+    
+    [self applyViewerSettings];
+}
+
+- (NSArray *)getSavedSignatures
+{
+    PTSignaturesManager *signaturesManager = [[PTSignaturesManager alloc] init];
+    NSUInteger numOfSignatures = [signaturesManager numberOfSavedSignatures];
+    NSMutableArray<NSString*> *signatures = [[NSMutableArray alloc] initWithCapacity:numOfSignatures];
+    
+    for (NSInteger i = 0; i < numOfSignatures; i++) {
+        signatures[i] = [[signaturesManager savedSignatureAtIndex:i] GetFileName];
+    }
+
+    return signatures;
+}
+
+-(NSString *)getSavedSignatureFolder
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *libraryDirectory = paths[0];
+
+    NSString* fullPath = [libraryDirectory stringByAppendingPathComponent:PTSignaturesManager_signatureDirectory];
+    return fullPath;
 }
 
 # pragma mark - Dark Mode
@@ -2579,6 +2653,16 @@ NS_ASSUME_NONNULL_END
     if([self.delegate respondsToSelector:@selector(navButtonClicked:)]) {
         [self.delegate navButtonClicked:self];
     }
+}
+
+- (void)commentHistoryPressed
+{
+    NSLog(@"HELLO COMMENT PRESSED");
+    if([self.delegate respondsToSelector:@selector(commentHistoryPressed:)]){
+        NSLog(@"CORRECT CONDITION");
+        [self.delegate commentHistoryPressed:self];
+    }
+    NSLog(@"WRONG CONDITION");
 }
 
 #pragma mark - Controls
@@ -2614,16 +2698,6 @@ NS_ASSUME_NONNULL_END
     NSNumber *rectY2 = [RNTPTDocumentView PT_idAsNSNumber:rect[PTRectY2Key]];
     CGRect screenRect = CGRectMake([rectX1 doubleValue], [rectY1 doubleValue], [rectX2 doubleValue]-[rectX1 doubleValue], [rectY2 doubleValue]-[rectY1 doubleValue]);
     [documentViewController shareCopyFromScreenRect:screenRect withFlattening:flattening];
-}
-
-
-#pragma mark - signSignatureFieldsWithStamps
-
--(void)setSignSignatureFieldsWithStamps:(BOOL)signSignatureFieldsWithStamps
-{
-    _signSignatureFieldsWithStamps = signSignatureFieldsWithStamps;
-    
-    [self applyViewerSettings];
 }
 
 #pragma mark - Zoom

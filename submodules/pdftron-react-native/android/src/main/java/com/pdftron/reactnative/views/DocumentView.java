@@ -85,6 +85,7 @@ import com.pdftron.pdf.utils.PdfDocManager;
 import com.pdftron.pdf.utils.PdfViewCtrlSettingsManager;
 import com.pdftron.pdf.utils.Utils;
 import com.pdftron.pdf.utils.ViewerUtils;
+import com.pdftron.pdf.utils.StampManager;
 import com.pdftron.pdf.widget.bottombar.builder.BottomBarBuilder;
 import com.pdftron.pdf.widget.toolbar.builder.AnnotationToolbarBuilder;
 import com.pdftron.pdf.widget.toolbar.builder.ToolbarButtonType;
@@ -218,8 +219,23 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
 
         mToolManagerBuilder = ToolManagerBuilder.from()
                 .addAnnotStyleProperty(new AnnotStyleProperty(Annot.e_Text).setCanShowPreset(false))
-                .setShowRichContentOption(false)
-                .setOpenToolbar(true);
+                .setFreeTextFontsFromAssets(new String[] 
+                    {
+                        "file:///android_asset/fonts/Aladin/Aladin-Regular.ttf",
+                        "file:///android_asset/fonts/Allura/Allura-Regular.ttf",
+                        "file:///android_asset/fonts/Cookie/Cookie-Regular.ttf",
+                        "file:///android_asset/fonts/Courgette/Courgette-Regular.ttf",
+                        "file:///android_asset/fonts/DancingScript/DancingScript-Regular.ttf",
+                        "file:///android_asset/fonts/GillSans/GillSans-Regular.ttf",
+                        "file:///android_asset/fonts/Helvetica/Helvetica-Regular.ttf",
+                        "file:///android_asset/fonts/Italianno/Italianno-Regular.ttf",
+                        "file:///android_asset/fonts/Lora/Lora-Regular.ttf",
+                        "file:///android_asset/fonts/Merriweather/Merriweather-Regular.ttf",
+                        "file:///android_asset/fonts/Roboto/Roboto-Regular.ttf",
+                    }
+                )
+                .setShowRichContentOption(true)
+                .setOpenToolbar(false);
         
         mBuilder = new ViewerConfig.Builder();
         mBuilder
@@ -253,6 +269,9 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
         if (menuItem.getItemId() == R.id.action_search_button) {
             openSearch();
         }
+        if (menuItem.getItemId() == R.id.action_commentsList){
+        		onCommentHistoryPressed();
+		}
         return false;
     }
     @Override
@@ -343,10 +362,13 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
     public void bottomToolbar(ReadableArray bottomToolbarItems) {
         BottomBarBuilder customBottomBar = BottomBarBuilder.withTag("CustomBottomBar");
 
+        // below is the button we want to attach the function
         for (int i = 0; i < bottomToolbarItems.size(); i++) {
             String item = bottomToolbarItems.getString(i);
             if (BUTTON_OUTLINE_LIST.equals(item)) {
                 customBottomBar.addCustomButton(R.string.action_outline, R.drawable.ic_edit_viewer_layout, R.id.action_outline);
+            } else if (BUTTON_COMMENT_HISTORY.equals(item)) {
+                customBottomBar.addCustomButton(R.string.action_commentsList, R.drawable.ic_comment_circle_text, R.id.action_commentsList);
             } else if (BUTTON_THUMBNAILS.equals(item)) {
                 customBottomBar.addCustomButton(R.string.action_thumbnails, R.drawable.ic_edit_viewer_thumbnail, R.id.action_thumbnails);
             }
@@ -1894,6 +1916,11 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
         onReceiveNativeEvent(ON_NAV_BUTTON_PRESSED, ON_NAV_BUTTON_PRESSED);
     }
 
+    public void onCommentHistoryPressed() {
+        onReceiveNativeEvent(ON_COMMENT_HISTORY_PRESSED, ON_COMMENT_HISTORY_PRESSED);
+    }
+
+
     @Override
     public boolean canShowFileInFolder() {
         return false;
@@ -1907,6 +1934,17 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
     @Override
     public boolean canRecreateActivity() {
         return !mFragmentTransactionFinished;
+    }
+
+    @Override
+    public void onStartSearchMode() {
+        super.onStartSearchMode();
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestLayout();
+            }
+        }, 100);
     }
 
     private boolean hasAnnotationsSelected() {
@@ -4187,6 +4225,27 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 {
         if (pdfViewCtrl != null) {
             mPdfViewCtrlTabHostFragment.onPageThumbnailOptionSelected(false, null);
         }
+    }
+
+    public ReadableArray getSavedSignatures() {
+        WritableArray signatures = Arguments.createArray();
+        Context context = getContext();
+        if (context != null) {
+            File[] files = StampManager.getInstance().getSavedSignatures(context);    
+            for (int i = 0; i < files.length; i++) {
+                signatures.pushString(files[i].getAbsolutePath());
+            }
+        }
+        return signatures;
+    }
+
+    public String getSavedSignatureFolder() {
+        Context context = getContext();
+        if (context != null) {
+            File file = StampManager.getInstance().getSavedSignatureFolder(context);
+            return file.getAbsolutePath();
+        }
+        return "";
     }
     
     public void setSaveStateEnabled(boolean saveStateEnabled) {

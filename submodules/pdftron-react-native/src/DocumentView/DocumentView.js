@@ -1,16 +1,17 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import {
   requireNativeComponent,
   ViewPropTypes,
   Platform,
   Alert,
   NativeModules,
-  findNodeHandle,
-} from 'react-native'
-const { DocumentViewManager } = NativeModules
+  findNodeHandle
+} from 'react-native';
+const { DocumentViewManager } = NativeModules;
 
 export default class DocumentView extends PureComponent {
+
   static propTypes = {
     document: PropTypes.string,
     password: PropTypes.string,
@@ -20,6 +21,7 @@ export default class DocumentView extends PureComponent {
     leadingNavButtonIcon: PropTypes.string,
     showLeadingNavButton: PropTypes.bool,
     onLeadingNavButtonPressed: PropTypes.func,
+    onCommentHistoryPressed: PropTypes.func,
     onDocumentLoaded: PropTypes.func,
     onDocumentError: PropTypes.func,
     onPageChanged: PropTypes.func,
@@ -112,960 +114,931 @@ export default class DocumentView extends PureComponent {
     excludedAnnotationListTypes: PropTypes.array,
     replyReviewStateEnabled: PropTypes.bool,
     ...ViewPropTypes,
-  }
+  };
 
   onChange = (event) => {
-    if (event.nativeEvent.onLeadingNavButtonPressed) {
+    if (event.nativeEvent.onCommentHistoryPressed){
       if (this.props.onLeadingNavButtonPressed) {
-        this.props.onLeadingNavButtonPressed()
+        this.props.onCommentHistoryPressed();
+      }
+    }
+    else if (event.nativeEvent.onLeadingNavButtonPressed) {
+      if (this.props.onLeadingNavButtonPressed) {
+        this.props.onLeadingNavButtonPressed();
       }
     } else if (event.nativeEvent.onDocumentLoaded) {
       if (this.props.onDocumentLoaded) {
-        this.props.onDocumentLoaded(event.nativeEvent.onDocumentLoaded)
+        this.props.onDocumentLoaded(event.nativeEvent.onDocumentLoaded);
       }
     } else if (event.nativeEvent.onPageChanged) {
       if (this.props.onPageChanged) {
         this.props.onPageChanged({
-          previousPageNumber: event.nativeEvent.previousPageNumber,
-          pageNumber: event.nativeEvent.pageNumber,
-        })
+        	'previousPageNumber': event.nativeEvent.previousPageNumber,
+        	'pageNumber': event.nativeEvent.pageNumber,
+        });
       }
     } else if (event.nativeEvent.onScrollChanged) {
       if (this.props.onScrollChanged) {
         this.props.onScrollChanged({
-          horizontal: event.nativeEvent.horizontal,
-          vertical: event.nativeEvent.vertical,
-        })
-      }
+        	'horizontal': event.nativeEvent.horizontal,
+          'vertical': event.nativeEvent.vertical,
+        });
+      } 
     } else if (event.nativeEvent.onZoomChanged) {
       if (this.props.onZoomChanged) {
         this.props.onZoomChanged({
-          zoom: event.nativeEvent.zoom,
-        })
+        	'zoom': event.nativeEvent.zoom,
+        });
       }
     } else if (event.nativeEvent.onZoomFinished) {
       if (this.props.onZoomFinished) {
         this.props.onZoomFinished({
-          zoom: event.nativeEvent.zoom,
-        })
+          'zoom': event.nativeEvent.zoom,
+        });
       }
     } else if (event.nativeEvent.onLayoutChanged) {
       if (this.props.onLayoutChanged) {
-        this.props.onLayoutChanged()
+        this.props.onLayoutChanged();
       }
     } else if (event.nativeEvent.onAnnotationChanged) {
       if (this.props.onAnnotationChanged) {
         this.props.onAnnotationChanged({
-          action: event.nativeEvent.action,
-          annotations: event.nativeEvent.annotations,
-        })
+          'action': event.nativeEvent.action,
+          'annotations': event.nativeEvent.annotations,
+        });
       }
     } else if (event.nativeEvent.onAnnotationsSelected) {
-      if (this.props.onAnnotationsSelected) {
-        this.props.onAnnotationsSelected({
-          annotations: event.nativeEvent.annotations,
-        })
-      }
+    	if (this.props.onAnnotationsSelected) {
+    		this.props.onAnnotationsSelected({
+    			'annotations': event.nativeEvent.annotations,
+    		});
+    	}
     } else if (event.nativeEvent.onFormFieldValueChanged) {
       if (this.props.onFormFieldValueChanged) {
         this.props.onFormFieldValueChanged({
-          fields: event.nativeEvent.fields,
-        })
+          'fields': event.nativeEvent.fields,
+        });
       }
     } else if (event.nativeEvent.onDocumentError) {
       if (this.props.onDocumentError) {
-        this.props.onDocumentError(event.nativeEvent.onDocumentError)
+        this.props.onDocumentError(event.nativeEvent.onDocumentError);
       } else {
-        const msg = event.nativeEvent.onDocumentError
-          ? event.nativeEvent.onDocumentError
-          : 'Unknown error'
-        Alert.alert('Alert', msg, [{ text: 'OK' }], { cancelable: true })
+        const msg = event.nativeEvent.onDocumentError ? event.nativeEvent.onDocumentError : 'Unknown error';
+        Alert.alert(
+          'Alert',
+          msg,
+          [
+            { text: 'OK' }
+          ],
+          { cancelable: true }
+        );
       }
     } else if (event.nativeEvent.onExportAnnotationCommand) {
       if (this.props.onExportAnnotationCommand) {
         this.props.onExportAnnotationCommand({
-          action: event.nativeEvent.action,
-          xfdfCommand: event.nativeEvent.xfdfCommand,
-          annotations: event.nativeEvent.annotations,
-        })
+          'action': event.nativeEvent.action,
+          'xfdfCommand': event.nativeEvent.xfdfCommand,
+          'annotations': event.nativeEvent.annotations,
+        });
       }
     } else if (event.nativeEvent.onAnnotationMenuPress) {
       if (this.props.onAnnotationMenuPress) {
         this.props.onAnnotationMenuPress({
-          annotationMenu: event.nativeEvent.annotationMenu,
-          annotations: event.nativeEvent.annotations,
-        })
+          'annotationMenu': event.nativeEvent.annotationMenu,
+          'annotations': event.nativeEvent.annotations,
+        });
       }
     } else if (event.nativeEvent.onLongPressMenuPress) {
       if (this.props.onLongPressMenuPress) {
         this.props.onLongPressMenuPress({
-          longPressMenu: event.nativeEvent.longPressMenu,
-          longPressText: event.nativeEvent.longPressText,
-        })
+          'longPressMenu': event.nativeEvent.longPressMenu,
+          'longPressText': event.nativeEvent.longPressText,
+        });
       }
     } else if (event.nativeEvent.onBehaviorActivated) {
       if (this.props.onBehaviorActivated) {
         this.props.onBehaviorActivated({
-          action: event.nativeEvent.action,
-          data: event.nativeEvent.data,
-        })
+          'action': event.nativeEvent.action,
+          'data': event.nativeEvent.data,
+        });
       }
     } else if (event.nativeEvent.onBookmarkChanged) {
       if (this.props.onBookmarkChanged) {
         this.props.onBookmarkChanged({
-          bookmarkJson: event.nativeEvent.bookmarkJson,
-        })
+          'bookmarkJson': event.nativeEvent.bookmarkJson,
+        });
       }
     } else if (event.nativeEvent.onToolChanged) {
       if (this.props.onToolChanged) {
         this.props.onToolChanged({
-          previousTool: event.nativeEvent.previousTool,
-          tool: event.nativeEvent.tool,
-        })
+          'previousTool': event.nativeEvent.previousTool,
+          'tool': event.nativeEvent.tool,
+        });
       }
     } else if (event.nativeEvent.onTextSearchStart) {
       if (this.props.onTextSearchStart) {
-        this.props.onTextSearchStart()
+        this.props.onTextSearchStart();
       }
     } else if (event.nativeEvent.onTextSearchResult) {
       if (this.props.onTextSearchResult) {
         this.props.onTextSearchResult({
-          found: event.nativeEvent.found,
-          textSelection: event.nativeEvent.textSelection,
-        })
+          'found': event.nativeEvent.found,
+          'textSelection': event.nativeEvent.textSelection,
+        });
       }
     } else if (event.nativeEvent.onUndoRedoStateChanged) {
       if (this.props.onUndoRedoStateChanged) {
-        this.props.onUndoRedoStateChanged()
+        this.props.onUndoRedoStateChanged();
       }
     } else if (event.nativeEvent.onPageMoved) {
       if (this.props.onPageMoved) {
         this.props.onPageMoved({
-          previousPageNumber: event.nativeEvent.previousPageNumber,
-          pageNumber: event.nativeEvent.pageNumber,
-        })
+          'previousPageNumber': event.nativeEvent.previousPageNumber,
+          'pageNumber': event.nativeEvent.pageNumber,
+        });
       }
     }
   }
 
   getDocumentPath = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getDocumentPath(tag)
+      return DocumentViewManager.getDocumentPath(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+  
   setToolMode = (toolMode) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setToolMode(tag, toolMode)
+    	return DocumentViewManager.setToolMode(tag, toolMode);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   commitTool = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.commitTool(tag)
+      return DocumentViewManager.commitTool(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getPageCount = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getPageCount(tag)
+      return DocumentViewManager.getPageCount(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   importBookmarkJson = (bookmarkJson) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.importBookmarkJson(tag, bookmarkJson)
+      return DocumentViewManager.importBookmarkJson(tag, bookmarkJson);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openBookmarkList = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openBookmarkList(tag)
+      return DocumentViewManager.openBookmarkList(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   importAnnotationCommand = (xfdfCommand, initialLoad) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
       if (initialLoad === undefined) {
-        initialLoad = false
+        initialLoad = false;
       }
       return DocumentViewManager.importAnnotationCommand(
         tag,
         xfdfCommand,
         initialLoad,
-      )
+      );
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   importAnnotations = (xfdf) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.importAnnotations(tag, xfdf)
+      return DocumentViewManager.importAnnotations(tag, xfdf);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   exportAnnotations = (options) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.exportAnnotations(tag, options)
+      return DocumentViewManager.exportAnnotations(tag, options);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   flattenAnnotations = (formsOnly) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.flattenAnnotations(tag, formsOnly)
+      return DocumentViewManager.flattenAnnotations(tag, formsOnly);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   deleteAnnotations = (annotations) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.deleteAnnotations(tag, annotations)
+      return DocumentViewManager.deleteAnnotations(tag, annotations);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   saveDocument = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.saveDocument(tag)
+      return DocumentViewManager.saveDocument(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setFlagForFields = (fields, flag, value) => {
-    const tag = findNodeHandle(this._viewerRef)
-    if (tag != null) {
-      return DocumentViewManager.setFlagForFields(tag, fields, flag, value)
+    const tag = findNodeHandle(this._viewerRef);
+    if(tag != null) {
+      return DocumentViewManager.setFlagForFields(tag, fields, flag, value);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getField = (fieldName) => {
-    const tag = findNodeHandle(this._viewerRef)
-    if (tag != null) {
-      return DocumentViewManager.getField(tag, fieldName)
+    const tag = findNodeHandle(this._viewerRef);
+    if(tag != null) {
+      return DocumentViewManager.getField(tag, fieldName);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openAnnotationList = () => {
-    const tag = findNodeHandle(this._viewerRef)
-    if (tag != null) {
-      return DocumentViewManager.openAnnotationList(tag)
+    const tag = findNodeHandle(this._viewerRef);
+    if(tag != null) {
+      return DocumentViewManager.openAnnotationList(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   /**
-   * note: this function exists for supporting the old version. It simply calls setValuesForFields.
-   *
-   */
+  * note: this function exists for supporting the old version. It simply calls setValuesForFields.
+  * 
+  */
   setValueForFields = (fieldsMap) => {
-    return this.setValuesForFields(fieldsMap)
+    return this.setValuesForFields(fieldsMap);
   }
 
   setValuesForFields = (fieldsMap) => {
-    const tag = findNodeHandle(this._viewerRef)
-    if (tag != null) {
-      return DocumentViewManager.setValuesForFields(tag, fieldsMap)
+    const tag = findNodeHandle(this._viewerRef);
+    if(tag != null) {
+      return DocumentViewManager.setValuesForFields(tag, fieldsMap);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   handleBackButton = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.handleBackButton(tag)
+      return DocumentViewManager.handleBackButton(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
+  
   /**
-   * note: this function exists for supporting the old version. It simply calls setFlagsForAnnotations.
-   *
-   */
+  * note: this function exists for supporting the old version. It simply calls setFlagsForAnnotations.
+  * 
+  */
   setFlagForAnnotations = (annotationFlagList) => {
-    return this.setFlagsForAnnotations(annotationFlagList)
+    return this.setFlagsForAnnotations(annotationFlagList);  
   }
-
+  
   setFlagsForAnnotations = (annotationFlagList) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setFlagsForAnnotations(tag, annotationFlagList)
+      return DocumentViewManager.setFlagsForAnnotations(tag, annotationFlagList);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   selectAnnotation = (id, pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.selectAnnotation(tag, id, pageNumber)
+      return DocumentViewManager.selectAnnotation(tag, id, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   /**
-   * note: this function exists for supporting the old version. It simply calls setPropertiesForAnnotation.
-   *
-   */
+  * note: this function exists for supporting the old version. It simply calls setPropertiesForAnnotation.
+  * 
+  */
   setPropertyForAnnotation = (id, pageNumber, propertyMap) => {
-    return setPropertiesForAnnotation(id, pageNumber, propertyMap)
+    return setPropertiesForAnnotation(id, pageNumber, propertyMap);
   }
 
   setPropertiesForAnnotation = (id, pageNumber, propertyMap) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setPropertiesForAnnotation(
-        tag,
-        id,
-        pageNumber,
-        propertyMap,
-      )
+      return DocumentViewManager.setPropertiesForAnnotation(tag, id, pageNumber, propertyMap);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getPropertiesForAnnotation = (id, pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getPropertiesForAnnotation(tag, id, pageNumber)
+      return DocumentViewManager.getPropertiesForAnnotation(tag, id, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setDrawAnnotations = (drawAnnotations) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setDrawAnnotations(tag, drawAnnotations)
+      return DocumentViewManager.setDrawAnnotations(tag, drawAnnotations);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setVisibilityForAnnotation = (id, pageNumber, visibility) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      DocumentViewManager.setVisibilityForAnnotation(
-        tag,
-        id,
-        pageNumber,
-        visibility,
-      )
+      DocumentViewManager.setVisibilityForAnnotation(tag, id, pageNumber, visibility);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+  
   setHighlightFields = (highlightFields) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      DocumentViewManager.setHighlightFields(tag, highlightFields)
+      DocumentViewManager.setHighlightFields(tag, highlightFields);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getAnnotationAtPoint = (x, y, distanceThreshold, minimumLineWeight) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getAnnotationAt(
-        tag,
-        x,
-        y,
-        distanceThreshold,
-        minimumLineWeight,
-      )
+      return DocumentViewManager.getAnnotationAt(tag, x, y, distanceThreshold, minimumLineWeight);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getAnnotationListAt = (x1, y1, x2, y2) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getAnnotationListAt(tag, x1, y1, x2, y2)
+      return DocumentViewManager.getAnnotationListAt(tag, x1, y1, x2, y2);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getAnnotationsOnPage = (pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getAnnotationListOnPage(tag, pageNumber)
+      return DocumentViewManager.getAnnotationListOnPage(tag, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getCustomDataForAnnotation = (annotationID, pageNumber, key) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getCustomDataForAnnotation(
-        tag,
-        annotationID,
-        pageNumber,
-        key,
-      )
+      return DocumentViewManager.getCustomDataForAnnotation(tag, annotationID, pageNumber, key);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getPageCropBox = (pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getPageCropBox(tag, pageNumber)
+      return DocumentViewManager.getPageCropBox(tag, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setCurrentPage = (pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setCurrentPage(tag, pageNumber)
+      return DocumentViewManager.setCurrentPage(tag, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getVisiblePages = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getVisiblePages(tag)
+      return DocumentViewManager.getVisiblePages(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   gotoPreviousPage = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.gotoPreviousPage(tag)
+      return DocumentViewManager.gotoPreviousPage(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   gotoNextPage = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.gotoNextPage(tag)
+      return DocumentViewManager.gotoNextPage(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   gotoFirstPage = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.gotoFirstPage(tag)
+      return DocumentViewManager.gotoFirstPage(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   gotoLastPage = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.gotoLastPage(tag)
+      return DocumentViewManager.gotoLastPage(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   showGoToPageView = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.showGoToPageView(tag)
+      return DocumentViewManager.showGoToPageView(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   closeAllTabs = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.closeAllTabs(tag)
+      return DocumentViewManager.closeAllTabs(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openTabSwitcher = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openTabSwitcher(tag)
+      return DocumentViewManager.openTabSwitcher(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getZoom = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getZoom(tag)
+      return DocumentViewManager.getZoom(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setZoomLimits = (zoomLimitMode, minimum, maximum) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setZoomLimits(
-        tag,
-        zoomLimitMode,
-        minimum,
-        maximum,
-      )
+      return DocumentViewManager.setZoomLimits(tag, zoomLimitMode, minimum, maximum);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   zoomWithCenter = (zoom, x, y) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.zoomWithCenter(tag, zoom, x, y)
+      return DocumentViewManager.zoomWithCenter(tag, zoom, x, y);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   zoomToRect = (pageNumber, rect) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.zoomToRect(tag, pageNumber, rect)
+      return DocumentViewManager.zoomToRect(tag, pageNumber, rect);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   smartZoom = (x, y, animated) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.smartZoom(tag, x, y, animated)
+      return DocumentViewManager.smartZoom(tag, x, y, animated);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+  
   getScrollPos = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getScrollPos(tag)
+      return DocumentViewManager.getScrollPos(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+    
   getCanvasSize = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getCanvasSize(tag)
+      return DocumentViewManager.getCanvasSize(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getPageRotation = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getPageRotation(tag)
+      return DocumentViewManager.getPageRotation(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   rotateClockwise = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.rotateClockwise(tag)
+      return DocumentViewManager.rotateClockwise(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   rotateCounterClockwise = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.rotateCounterClockwise(tag)
+      return DocumentViewManager.rotateCounterClockwise(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
+
   convertScreenPointsToPagePoints = (points) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.convertScreenPointsToPagePoints(tag, points)
+      return DocumentViewManager.convertScreenPointsToPagePoints(tag, points);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   convertPagePointsToScreenPoints = (points) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.convertPagePointsToScreenPoints(tag, points)
+      return DocumentViewManager.convertPagePointsToScreenPoints(tag, points);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getPageNumberFromScreenPoint = (x, y) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getPageNumberFromScreenPoint(tag, x, y)
+      return DocumentViewManager.getPageNumberFromScreenPoint(tag, x, y);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setProgressiveRendering = (progressiveRendering, initialDelay, interval) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setProgressiveRendering(
-        tag,
-        progressiveRendering,
-        initialDelay,
-        interval,
-      )
+      return DocumentViewManager.setProgressiveRendering(tag, progressiveRendering, initialDelay, interval);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setImageSmoothing = (imageSmoothing) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setImageSmoothing(tag, imageSmoothing)
+      return DocumentViewManager.setImageSmoothing(tag, imageSmoothing);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setOverprint = (overprint) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setOverprint(tag, overprint)
+      return DocumentViewManager.setOverprint(tag, overprint);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setColorPostProcessMode = (colorPostProcessMode) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      DocumentViewManager.setColorPostProcessMode(tag, colorPostProcessMode)
+      DocumentViewManager.setColorPostProcessMode(tag, colorPostProcessMode);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setColorPostProcessColors = (whiteColor, blackColor) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setColorPostProcessColors(
-        tag,
-        whiteColor,
-        blackColor,
-      )
+      return DocumentViewManager.setColorPostProcessColors(tag, whiteColor, blackColor);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   startSearchMode = (searchString, matchCase, matchWholeWord) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.startSearchMode(
-        tag,
-        searchString,
-        matchCase,
-        matchWholeWord,
-      )
+      return DocumentViewManager.startSearchMode(tag, searchString, matchCase, matchWholeWord);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   exitSearchMode = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.exitSearchMode(tag)
+      return DocumentViewManager.exitSearchMode(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   findText = (searchString, matchCase, matchWholeWord, searchUp, regExp) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.findText(
-        tag,
-        searchString,
-        matchCase,
-        matchWholeWord,
-        searchUp,
-        regExp,
-      )
+      return DocumentViewManager.findText(tag, searchString, matchCase, matchWholeWord, searchUp, regExp);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   cancelFindText = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.cancelFindText(tag)
+      return DocumentViewManager.cancelFindText(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openSearch = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openSearch(tag)
+      return DocumentViewManager.openSearch(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getSelection = (pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getSelection(tag, pageNumber)
+      return DocumentViewManager.getSelection(tag, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   hasSelection = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.hasSelection(tag)
+      return DocumentViewManager.hasSelection(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   clearSelection = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.clearSelection(tag)
+      return DocumentViewManager.clearSelection(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   getSelectionPageRange = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.getSelectionPageRange(tag)
+      return DocumentViewManager.getSelectionPageRange(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   hasSelectionOnPage = (pageNumber) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.hasSelectionOnPage(tag, pageNumber)
+      return DocumentViewManager.hasSelectionOnPage(tag, pageNumber);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
+  
   selectInRect = (rect) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.selectInRect(tag, rect)
+      return DocumentViewManager.selectInRect(tag, rect);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   isThereTextInRect = (rect) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.isThereTextInRect(tag, rect)
+      return DocumentViewManager.isThereTextInRect(tag, rect);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   selectAll = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.selectAll(tag)
+      return DocumentViewManager.selectAll(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setPageBorderVisibility = (pageBorderVisibility) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setPageBorderVisibility(
-        tag,
-        pageBorderVisibility,
-      )
+       return DocumentViewManager.setPageBorderVisibility(tag, pageBorderVisibility);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setPageTransparencyGrid = (pageTransparencyGrid) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setPageTransparencyGrid(
-        tag,
-        pageTransparencyGrid,
-      )
+      return DocumentViewManager.setPageTransparencyGrid(tag, pageTransparencyGrid);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setDefaultPageColor = (defaultPageColor) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setDefaultPageColor(tag, defaultPageColor)
+       return DocumentViewManager.setDefaultPageColor(tag, defaultPageColor);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setBackgroundColor = (backgroundColor) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setBackgroundColor(tag, backgroundColor)
+      return DocumentViewManager.setBackgroundColor(tag, backgroundColor);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   exportAsImage = (pageNumber, dpi, exportFormat) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.exportAsImage(
-        tag,
-        pageNumber,
-        dpi,
-        exportFormat,
-      )
+       return DocumentViewManager.exportAsImage(tag, pageNumber, dpi, exportFormat);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   undo = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.undo(tag)
+       return DocumentViewManager.undo(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   redo = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.redo(tag)
+       return DocumentViewManager.redo(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   canUndo = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.canUndo(tag)
+       return DocumentViewManager.canUndo(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   canRedo = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.canRedo(tag)
+       return DocumentViewManager.canRedo(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   showCrop = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.showCrop(tag)
+       return DocumentViewManager.showCrop(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   setCurrentToolbar = (toolbar) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.setCurrentToolbar(tag, toolbar)
+       return DocumentViewManager.setCurrentToolbar(tag, toolbar);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+  
   showViewSettings = (rect) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.showViewSettings(tag, rect)
+        return DocumentViewManager.showViewSettings(tag, rect);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   showRotateDialog = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.showRotateDialog(tag)
+       return DocumentViewManager.showRotateDialog(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   showAddPagesView = (rect) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.showAddPagesView(tag, rect)
+        return DocumentViewManager.showAddPagesView(tag, rect);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   isReflowMode = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.isReflowMode(tag)
+        return DocumentViewManager.isReflowMode(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   toggleReflow = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.toggleReflow(tag)
+       return DocumentViewManager.toggleReflow(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   shareCopy = (rect, flattening) => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.shareCopy(tag, rect, flattening)
+        return DocumentViewManager.shareCopy(tag, rect, flattening);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
-
+ 
   openThumbnailsView = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openThumbnailsView(tag)
+       return DocumentViewManager.openThumbnailsView(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openOutlineList = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openOutlineList(tag)
+      return DocumentViewManager.openOutlineList(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openLayersList = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openLayersList(tag)
+      return DocumentViewManager.openLayersList(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   openNavigationLists = () => {
-    const tag = findNodeHandle(this._viewerRef)
+    const tag = findNodeHandle(this._viewerRef);
     if (tag != null) {
-      return DocumentViewManager.openNavigationLists(tag)
+      return DocumentViewManager.openNavigationLists(tag);
     }
-    return Promise.resolve()
+    return Promise.resolve();
+  }
+
+  getSavedSignatures = () => {
+    const tag = findNodeHandle(this._viewerRef);
+    if (tag != null) {
+       return DocumentViewManager.getSavedSignatures(tag);
+    }
+    return Promise.resolve();
+  }
+
+  getSavedSignatureFolder = () => {
+    const tag = findNodeHandle(this._viewerRef);
+    if (tag != null) {
+       return DocumentViewManager.getSavedSignatureFolder(tag);
+    }
+    return Promise.resolve();
   }
 
   _setNativeRef = (ref) => {
-    this._viewerRef = ref
-  }
+    this._viewerRef = ref;
+  };
 
   render() {
     return (
       <RCTDocumentView
         ref={this._setNativeRef}
-        style={{ flex: 1 }}
+        style={{ flex:1 }}
         onChange={this.onChange}
         {...this.props}
       />
@@ -1073,10 +1046,14 @@ export default class DocumentView extends PureComponent {
   }
 }
 
-const name = Platform.OS === 'ios' ? 'RNTPTDocumentView' : 'RCTDocumentView'
+const name = Platform.OS === 'ios' ? 'RNTPTDocumentView' : 'RCTDocumentView';
 
-const RCTDocumentView = requireNativeComponent(name, DocumentView, {
-  nativeOnly: {
-    onChange: true,
-  },
-})
+const RCTDocumentView = requireNativeComponent(
+  name,
+  DocumentView,
+  {
+    nativeOnly: {
+      onChange: true
+    }
+  }
+);
