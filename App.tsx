@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Platform, View, PermissionsAndroid, StatusBar } from "react-native";
-const { RNPdftron } = require("react-native-pdftron");
 import HomeScreen from "./src/HomeScreen";
 import DocumentViewer from "./src/DocumentViewer";
 import { NavigationContainer, RouteProp } from "@react-navigation/native";
@@ -72,7 +71,6 @@ export default class App extends Component<{}, AppStates> {
       return (
         <NavigationContainer>
           <StatusBar backgroundColor="white" barStyle="dark-content" />
-
           <MainStack.Navigator headerMode="none">
             <MainStack.Screen name="HomeScreen" component={HomeScreen} />
             <MainStack.Screen
