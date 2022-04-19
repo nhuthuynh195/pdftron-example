@@ -2,7 +2,6 @@ package com.pdftron.reactnative.modules;
 
 import android.app.Activity;
 import android.content.Intent;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.react.bridge.ActivityEventListener;
@@ -15,7 +14,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.pdftron.pdf.dialog.digitalsignature.DigitalSignatureDialogFragment;
-import com.pdftron.reactnative.R;
 import com.pdftron.reactnative.viewmanagers.DocumentViewViewManager;
 
 public class DocumentViewModule extends ReactContextBaseJavaModule implements ActivityEventListener {
@@ -82,13 +80,13 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
     }
 
     @ReactMethod
-    public void importAnnotations(final int tag, final String xfdf, final Promise promise) {
+    public void importAnnotations(final int tag, final String xfdf, final boolean replace, final Promise promise) {
         getReactApplicationContext().runOnUiQueueThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    mDocumentViewInstance.importAnnotations(tag, xfdf);
-                    promise.resolve(null);
+                    WritableArray importedAnnotations = mDocumentViewInstance.importAnnotations(tag, xfdf, replace);
+                    promise.resolve(importedAnnotations);
                 } catch (Exception ex) {
                     promise.reject(ex);
                 }
@@ -125,6 +123,36 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
             }
         });
     }
+    //HACK start lumin customize 
+    @ReactMethod
+    public void saveSignature(final int tag, final String path, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String message = mDocumentViewInstance.saveSignature(tag, path);
+                    promise.resolve(message);
+                } catch (Exception ex) {
+                    promise.reject(ex);
+                }
+            }
+        });
+    }
+    //HACK start lumin customize 
+    @ReactMethod
+    public void removeAllSignature(final int tag, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String message = mDocumentViewInstance.removeAllSignature(tag);
+                    promise.resolve(message);
+                } catch (Exception ex) {
+                    promise.reject(ex);
+                }
+            }
+        });
+    }
 
     @ReactMethod
     public void flattenAnnotations(final int tag, final boolean formsOnly, final Promise promise) {
@@ -149,6 +177,21 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
                 try {
                     String path = mDocumentViewInstance.getDocumentPath(tag);
                     promise.resolve(path);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getAllFields(final int tag, final int pageNumber, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WritableArray fields = mDocumentViewInstance.getAllFields(tag, pageNumber);
+                    promise.resolve(fields);
                 } catch (Exception e) {
                     promise.reject(e);
                 }
@@ -604,7 +647,6 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
             }
         });
     }
-
 
     @ReactMethod
     public void getPageRotation(final int tag, final Promise promise) {
@@ -1136,7 +1178,7 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
     @ReactMethod
     public void exportAsImage(final int tag, int pageNumber, double dpi, String exportFormat, final Promise promise) {
         try {
-            String result = mDocumentViewInstance.exportToImage(tag, pageNumber, dpi, exportFormat);
+            String result = mDocumentViewInstance.exportAsImage(tag, pageNumber, dpi, exportFormat);
             promise.resolve(result);
         } catch (Exception ex) {
             promise.reject(ex);
@@ -1378,6 +1420,51 @@ public class DocumentViewModule extends ReactContextBaseJavaModule implements Ac
                     promise.resolve(null);
                 } catch (Exception ex) {
                     promise.reject(ex);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getSavedSignatures(final int tag, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ReadableArray result = mDocumentViewInstance.getSavedSignatures(tag);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getSavedSignatureFolder(final int tag, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String result = mDocumentViewInstance.getSavedSignatureFolder(tag);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+            }
+        });
+    }
+
+    @ReactMethod
+    public void getSavedSignatureJpgFolder(final int tag, final Promise promise) {
+        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String result = mDocumentViewInstance.getSavedSignatureJpgFolder(tag);
+                    promise.resolve(result);
+                } catch (Exception e) {
+                    promise.reject(e);
                 }
             }
         });

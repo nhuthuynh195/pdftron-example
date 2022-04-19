@@ -2,6 +2,11 @@ package com.pdftron.reactnative.utils;
 
 public final class Constants {
     // EVENTS
+    //Lumin custom start
+    public static final String ON_COMMENT_HISTORY_PRESSED = "onCommentHistoryPressed";
+    public static final String ON_NOTES_HISTORY_PRESSED = "onNotesHistoryPressed";
+    public static final String ON_MORE_BUTTON_PRESSED = "onMoreButtonPressed";
+    //Lumin custom end
     public static final String ON_NAV_BUTTON_PRESSED = "onLeadingNavButtonPressed";
     public static final String ON_DOCUMENT_LOADED = "onDocumentLoaded";
     public static final String ON_PAGE_CHANGED = "onPageChanged";
@@ -23,6 +28,12 @@ public final class Constants {
     public static final String ON_TEXT_SEARCH_RESULT = "onTextSearchResult";
     public static final String ON_UNDO_REDO_STATE_CHANGED = "onUndoRedoStateChanged";
     public static final String ON_PAGE_MOVED = "onPageMoved";
+    public static final String ON_PAGES_ADDED = "onPagesAdded";
+    public static final String ON_PAGES_REMOVED = "onPagesRemoved";
+    public static final String ON_PAGES_ROTATED = "onPagesRotated";
+    public static final String ON_TAB_CHANGED = "onTabChanged";
+    public static final String ON_ANNOTATION_FLATTENED = "onAnnotationFlattened";
+    public static final String ON_ANNOTATION_TOOLBAR_ITEM_PRESS = "onAnnotationToolbarItemPress";
 
     // BUTTONS
     public static final String BUTTON_TOOLS = "toolsButton";
@@ -54,6 +65,8 @@ public final class Constants {
     public static final String BUTTON_SAVE_REDUCED_COPY = "saveReducedCopyButton";
     public static final String BUTTON_SAVE_CROPPED_COPY = "saveCroppedCopyButton";
     public static final String BUTTON_SAVE_PASSWORD_COPY = "savePasswordCopyButton";
+    public static final String BUTTON_TABS = "tabsButton";
+    public static final String BUTTON_FILE_ATTACHMENT = "fileAttachmentButton";
 
     // TOOL BUTTONS
     public static final String TOOL_BUTTON_FREE_HAND = "freeHandToolButton";
@@ -75,6 +88,7 @@ public final class Constants {
     public static final String TOOL_BUTTON_STAMP = "stampToolButton";
     public static final String TOOL_BUTTON_EDIT = "editToolButton";
     public static final String TOOL_BUTTON_ADD_PAGE = "addPageButton";
+    public static final String TOOL_BUTTON_INSERT_PAGE = "insertPageButton";
 
     // TOOLS
     public static final String TOOL_ANNOTATION_CREATE_FREE_HAND = "AnnotationCreateFreeHand";
@@ -99,6 +113,7 @@ public final class Constants {
     public static final String TOOL_ANNOTATION_CREATE_AREA_MEASUREMENT = "AnnotationCreateAreaMeasurement";
     public static final String TOOL_ANNOTATION_CREATE_RECT_AREA_MEASUREMENT = "AnnotationCreateRectAreaMeasurement";
     public static final String TOOL_TEXT_SELECT = "TextSelect";
+    public static final String TOOL_MULTI_SELECT = "MultiSelect";
     public static final String TOOL_ANNOTATION_EDIT = "AnnotationEdit";
     public static final String TOOL_ANNOTATION_CREATE_SOUND = "AnnotationCreateSound";
     public static final String TOOL_PAN = "Pan";
@@ -120,6 +135,8 @@ public final class Constants {
     public static final String TOOL_ANNOTATION_CREATE_SMART_PEN = "AnnotationCreateSmartPen";
     public static final String TOOL_ANNOTATION_CREATE_FREE_TEXT_DATE = "AnnotationCreateFreeTextDate";
     public static final String TOOL_ANNOTATION_CREATE_FREE_SPACING_TEXT = "AnnotationCreateFreeSpacingText";
+    public static final String TOOL_INSERT_PAGE = "InsertPage";
+    public static final String TOOL_FORM_FILL = "FormFill";
 
     // Field types
     public static final String FIELD_TYPE_UNKNOWN = "unknown";
@@ -147,6 +164,11 @@ public final class Constants {
     public static final String TOOLBAR_KEY_NAME = "name";
     public static final String TOOLBAR_KEY_ICON = "icon";
     public static final String TOOLBAR_KEY_ITEMS = "items";
+
+    // Custom button
+    public static final String TOOLBAR_ITEM_KEY_ID = "id";
+    public static final String TOOLBAR_ITEM_KEY_NAME = "name";
+    public static final String TOOLBAR_ITEM_KEY_ICON = "icon";
 
     // FIT MODES
     public static final String FIT_MODE_FIT_PAGE = "FitPage";
@@ -239,11 +261,19 @@ public final class Constants {
     public static final String MENU_ID_STRING_SIGN_AND_SAVE = "signAndSave";
     public static final String MENU_ID_STRING_THICKNESS = "thickness";
     public static final String MENU_ID_STRING_TRANSLATE = "translate";
-    public static final String MENU_ID_STRING_TYPE = "type";
     public static final String MENU_ID_STRING_UNGROUP = "ungroup";
+    public static final String MENU_ID_STRING_DUPLICATE = "duplicate";
 
+    // Thumbnails
     public static final String THUMBNAIL_FILTER_MODE_ANNOTATED = "annotated";
     public static final String THUMBNAIL_FILTER_MODE_BOOKMARKED = "bookmarked";
+    public static final String THUMBNAIL_INSERT_PAGES = "thumbnailsInsertPages";
+    public static final String THUMBNAIL_EXPORT_PAGES = "thumbnailsExportPages";
+    public static final String THUMBNAIL_DUPLICATE_PAGES = "thumbnailsDuplicatePages";
+    public static final String THUMBNAIL_ROTATE_PAGES = "thumbnailsRotatePages";
+    public static final String THUMBNAIL_DELETE_PAGES = "thumbnailsDeletePages";
+    public static final String THUMBNAIL_INSERT_FROM_IMAGE = "thumbnailsInsertFromImage";
+    public static final String THUMBNAIL_INSERT_FROM_DOCUMENT = "thumbnailsInsertFromDocument";
 
     public static final String VIEW_MODE_CROP = "viewModeCrop";
     public static final String VIEW_MODE_ROTATION = "viewModeRotation";
@@ -295,6 +325,7 @@ public final class Constants {
     public static final String KEY_FIELD_NAME = "fieldName";
     public static final String KEY_FIELD_VALUE = "fieldValue";
     public static final String KEY_FIELD_TYPE = "fieldType";
+    public static final String KEY_FIELD_HAS_APPEARANCE = "fieldHasAppearance";
     public static final String KEY_ERROR = "error";
 
     public static final String KEY_ANNOTATION_MENU = "annotationMenu";
@@ -326,8 +357,12 @@ public final class Constants {
 
     public static final String KEY_BOOKMARK_JSON = "bookmarkJson";
 
+    public static final String KEY_PAGE_NUMBERS = "pageNumbers";
+
     public static final String KEY_PREVIOUS_TOOL = "previousTool";
     public static final String KEY_TOOL = "tool";
+
+    public static final String KEY_CURRENT_TAB = "currentTab";
 
     // Color RGBA
     public static final String COLOR_RED = "red";
@@ -365,6 +400,14 @@ public final class Constants {
 
     // Export format
     public static final String KEY_EXPORT_FORMAT_BMP = "BMP";
-    public static final String KEY_EXPORT_FORMAT_JPG = "JPG";
+    public static final String KEY_EXPORT_FORMAT_JPEG = "JPEG";
     public static final String KEY_EXPORT_FORMAT_PNG = "PNG";
+
+    // AnnotationManagerEditMode
+    public static final String KEY_ANNOTATION_MANAGER_EDIT_MODE_OWN = "own";
+    public static final String KEY_ANNOTATION_MANAGER_EDIT_MODE_ALL = "all";
+
+    // AnnotationManagerUndoMode
+    public static final String KEY_ANNOTATION_MANAGER_UNDO_MODE_OWN = "own";
+    public static final String KEY_ANNOTATION_MANAGER_UNDO_MODE_ALL = "all";
 }

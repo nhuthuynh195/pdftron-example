@@ -6,4 +6,10 @@
         app:iconTint="@color/neutral_60" 
         android:title="@string/action_search" 
         app:showAsAction="always"/>
+        <item
+        android:id="@+id/action_moreButton"
+        android:icon="@drawable/ic_basic_more_horizontal" 
+        app:iconTint="@color/neutral_60" 
+        android:title="@string/action_moreButton" 
+        app:showAsAction="always"/>
 </menu>

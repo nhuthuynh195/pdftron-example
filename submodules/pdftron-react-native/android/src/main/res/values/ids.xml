@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="action_commentsList" type="id"/>
+    <item name="action_notesList" type="id"/>
+    <item name="action_moreButton" type="id"/>
+</resources>

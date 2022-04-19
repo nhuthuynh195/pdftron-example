@@ -15,13 +15,11 @@
 
 - (void)setToolModeForDocumentViewTag:(NSNumber *)tag toolMode:(NSString *)toolMode;
 
-- (void)openCommentListForDocumentViewTag:(NSNumber *)tag annotationId:(NSString *)annotationId;
-
 - (BOOL)commitToolForDocumentViewTag:(NSNumber *)tag;
 
 - (NSString *)getDocumentPathForDocumentViewTag:(NSNumber *)tag;
 
-- (NSString*) exportAsImageForDocumentViewTag:(NSNumber*)tag pageNumber:(int)pageNumber dpi:(int)dpi imageFormat:(NSString*)imageFormat;
+- (NSString*) exportAsImageForDocumentViewTag:(NSNumber*)tag pageNumber:(int)pageNumber dpi:(int)dpi exportFormat:(NSString*)exportFormat;
 
 - (int)getPageCountForDocumentViewTag:(NSNumber *)tag;
 
@@ -30,13 +28,20 @@
 - (void)openBookmarkListForDocumentViewTag:(NSNumber *)tag;
 
 - (NSString *)exportAnnotationsForDocumentViewTag:(NSNumber *)tag options:(NSDictionary *)options;
-- (void)importAnnotationsForDocumentViewTag:(NSNumber *)tag xfdf:(NSString *)xfdfString;
+
+- (nullable NSArray<NSDictionary *> *)importAnnotationsForDocumentViewTag:(NSNumber *)tag xfdf:(NSString *)xfdfString replace:(BOOL)replace;
 
 - (void)flattenAnnotationsForDocumentViewTag:(NSNumber *)tag formsOnly:(BOOL)formsOnly;
 
 - (void)deleteAnnotationsForDocumentViewTag:(NSNumber *)tag annotations:(NSArray *)annotations;
 
 - (void)saveDocumentForDocumentViewTag:(NSNumber *)tag completionHandler:(void (^)(NSString * _Nullable filePath))completionHandler;
+
+//Lumin custom start
+- (void)addSignatureForDocumentViewerTag:(NSNumber *)tag path:(NSString *)path;
+- (void)removeSignatureForDocumentViewerTag:(NSNumber *)tag indexSignature:(NSInteger)indexSignature;
+- (void)removeSignaturesForDocumentViewerTag:(NSNumber *)tag;
+//Lumin custom end
 
 - (void)setFlagForFieldsForDocumentViewTag:(NSNumber *)tag forFields:(NSArray<NSString *> *)fields setFlag:(PTFieldFlag)flag toValue:(BOOL)value;
 
@@ -67,6 +72,8 @@
 - (NSString *)getCustomDataForAnnotationForDocumentViewTag:(NSNumber *) tag annotationId:(NSString *)annotationId  pageNumber:(NSInteger)pageNumber key:(NSString *)key;
 
 - (NSDictionary<NSString *, NSNumber *> *)getPageCropBoxForDocumentViewTag:(NSNumber *)tag pageNumber:(NSInteger)pageNumber;
+
+- (NSMutableArray<NSDictionary *> *)getAllFieldsForDocumentViewTag:(NSNumber *)tag pageNumber:(NSInteger)pageNumber;
 
 - (BOOL)setCurrentPageForDocumentViewTag:(NSNumber *)tag pageNumber:(NSInteger)pageNumber;
 
@@ -126,8 +133,6 @@
 
 - (void)setOverprintforDocumentViewTag:(NSNumber *)tag overprint:(NSString *)overprint;
 
-- (void)setUrlExtractionForDocumentViewTag:(NSNumber *)tag urlExtraction:(BOOL)urlExtraction;
-
 - (void)setPageBorderVisibilityForDocumentViewTag:(NSNumber *)tag pageBorderVisibility:(BOOL)pageBorderVisibility;
 
 - (void)setPageTransparencyGridForDocumentViewTag:(NSNumber *)tag pageTransparencyGrid:(BOOL)pageTransparencyGrid;
@@ -143,6 +148,8 @@
 - (void)findTextForDocumentViewTag:(NSNumber *)tag searchString:(NSString *)searchString matchCase:(BOOL)matchCase matchWholeWord:(BOOL)matchWholeWord searchUp:(BOOL)searchUp regExp:(BOOL)regExp;
 
 - (void)cancelFindTextForDocumentViewTag:(NSNumber *)tag;
+
+- (void)openSearchForDocumentViewTag:(NSNumber *)tag;
 
 - (void)startSearchModeForDocumentViewTag:(NSNumber *)tag searchString:(NSString *)searchString matchCase:(BOOL)matchCase matchWholeWord:(BOOL)matchWholeWord;
 
@@ -187,5 +194,9 @@
 - (void)shareCopyForDocumentViewTag:(nonnull NSNumber *)tag rect:(NSDictionary *)rect withFlattening:(BOOL)flattening;
 
 - (void)openThumbnailsViewForDocumentViewTag:(NSNumber *)tag;
+
+- (NSArray *)getSavedSignaturesForDocumentViewTag:(NSNumber *)tag;
+
+- (NSString *)getSavedSignatureFolderForDocumentViewTag:(NSNumber *)tag;
 
 @end

@@ -25,7 +25,7 @@ RCT_EXPORT_MODULE(DocumentViewManager) // JS-name
     return [NSError errorWithDomain:@"com.pdftron.react-native" code:0 userInfo:
             @{
               NSLocalizedDescriptionKey: exception.name,
-              NSLocalizedFailureReasonErrorKey: exception.reason,
+              NSLocalizedFailureReasonErrorKey: exception.reason ?: @"",
               }];
 }
 
@@ -43,20 +43,6 @@ RCT_REMAP_METHOD(setToolMode,
     }
     @catch (NSException *exception) {
         reject(@"set_tool_mode_failed", @"Failed to set tool mode", [self errorFromException:exception]);
-    }
-}
-
-RCT_REMAP_METHOD(openCommentList,
-                 openCommentListForDocumentViewTag:(nonnull NSNumber *)tag
-                 annotationId:(NSString *)annotationId
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject){
-    @try {
-        [[self documentViewManager] openCommentListForDocumentViewTag:tag annotationId:annotationId];
-        resolve(nil);
-    }
-    @catch (NSException *exception) {
-        reject(@"commit_tool", @"Failed to commit tool", [self errorFromException:exception]);
     }
 }
 
@@ -90,16 +76,31 @@ RCT_REMAP_METHOD(getDocumentPath,
     }
 }
 
-RCT_REMAP_METHOD(exportAsImage,
-                 exportAsImageForDocumentViewTag:(nonnull NSNumber *)tag
+RCT_REMAP_METHOD(getAllFields,
+                 getAllFieldsForDocumentViewTag:(nonnull NSNumber *)tag
                  pageNumber:(int)pageNumber
-                 dpi:(int)dpi
-                 imageFormat:(NSString*)imageFormat
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     @try {
-        NSString *path = [[self documentViewManager] exportAsImageForDocumentViewTag:tag pageNumber:pageNumber dpi:dpi imageFormat:(NSString*)imageFormat];
+        NSMutableArray<NSDictionary *> *fields= [[self documentViewManager] getAllFieldsForDocumentViewTag:tag pageNumber:pageNumber];
+        resolve(fields);
+    }
+    @catch (NSException *exception) {
+        reject(@"export_failed", @"Failed to get all fields for the page", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(exportAsImage,
+                 exportAsImageForDocumentViewTag:(nonnull NSNumber *)tag
+                 pageNumber:(int)pageNumber
+                 dpi:(int)dpi
+                 exportFormat:(NSString*)exportFormat
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSString *path = [[self documentViewManager] exportAsImageForDocumentViewTag:tag pageNumber:pageNumber dpi:dpi exportFormat:exportFormat];
         resolve(path);
     }
     @catch (NSException *exception) {
@@ -184,12 +185,13 @@ RCT_REMAP_METHOD(exportAnnotations,
 RCT_REMAP_METHOD(importAnnotations,
                  importAnnotationsForDocumentViewTag:(nonnull NSNumber *)tag
                  xfdf:(NSString *)xfdf
+                 replace:(BOOL)replace
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     @try {
-        [[self documentViewManager] importAnnotationsForDocumentViewTag:tag xfdf:xfdf];
-        resolve(nil);
+        NSArray<NSDictionary *>* importedAnnotations = [[self documentViewManager] importAnnotationsForDocumentViewTag:tag xfdf:xfdf replace:replace];
+        resolve(importedAnnotations);
     }
     @catch (NSException *exception) {
         reject(@"import_failed", @"Failed to import annotations", [self errorFromException:exception]);
@@ -244,6 +246,49 @@ RCT_REMAP_METHOD(saveDocument,
         reject(@"save_failed", @"Failed to save document", [self errorFromException:exception]);
     }
 }
+
+//Lumin custom start
+RCT_REMAP_METHOD(saveSignature,
+                 addSignatureForDocumentViewerTag:(nonnull NSNumber *)tag
+                 path:(NSString *)path
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [[self documentViewManager] addSignatureForDocumentViewerTag:tag path:path];
+    }
+    @catch (NSException *exception) {
+        reject(@"add_signature_faild", @"Failed to add signature.", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(removeSignature,
+                 removeSignatureForDocumentViewerTag:(nonnull NSNumber *)tag
+                 indexSignature:(NSInteger)indexSignature
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [[self documentViewManager] removeSignatureForDocumentViewerTag:tag indexSignature:indexSignature];
+    }
+    @catch (NSException *exception) {
+        reject(@"remove_signature_faild", @"Failed to remove signature.", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(removeAllSignature,
+                 removeSignaturesForDocumentViewerTag:(nonnull NSNumber *)tag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [[self documentViewManager] removeSignaturesForDocumentViewerTag:tag];
+    }
+    @catch (NSException *exception) {
+        reject(@"remove_signatures_faild", @"Failed to remove signatures.", [self errorFromException:exception]);
+    }
+}
+//Lumin custom end
 
 RCT_REMAP_METHOD(setFlagForFields,
                  setFlagForFieldsForDocumentViewTag:(nonnull NSNumber *)tag
@@ -1016,21 +1061,6 @@ RCT_REMAP_METHOD(setOverprint,
     }
 }
 
-RCT_REMAP_METHOD(setUrlExtraction,
-                 setUrlExtractionForDocumentViewTag: (nonnull NSNumber *) tag
-                 urlExtraction:(BOOL)urlExtraction
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejector:(RCTPromiseRejectBlock)reject)
-{
-    @try {
-        [[self documentViewManager] setUrlExtractionForDocumentViewTag:tag urlExtraction:urlExtraction];
-        resolve(nil);
-    }
-    @catch (NSException *exception) {
-        reject(@"set_url_extraction", @"Failed to set url extraction", [self errorFromException:exception]);
-    }
-}
-
 RCT_REMAP_METHOD(setPageBorderVisibility,
                  setPageBorderVisibilityForDocumentViewTag: (nonnull NSNumber *) tag
                  pageBorderVisibility:(BOOL)pageBorderVisibility
@@ -1151,6 +1181,20 @@ RCT_REMAP_METHOD(cancelFindText,
     }
     @catch (NSException *exception) {
         reject(@"cancel_text", @"Failed to cancel text search", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(openSearch,
+                 openSearchForDocumentViewTag: (nonnull NSNumber *)tag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejector:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        [[self documentViewManager] openSearchForDocumentViewTag:tag];
+        resolve(nil);
+    }
+    @catch (NSException *exception) {
+        reject(@"open_search", @"Failed to open search", [self errorFromException:exception]);
     }
 }
 
@@ -1339,6 +1383,34 @@ RCT_REMAP_METHOD(openNavigationLists,
     }
     @catch (NSException *exception) {
         reject(@"open_navigation_lists_failed", @"Failed to open navigation lists", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(getSavedSignatures,
+                 getSavedSignaturesForDocumentViewTag: (nonnull NSNumber *)tag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSArray *signatures = [[self documentViewManager] getSavedSignaturesForDocumentViewTag:tag];
+        resolve(signatures);
+    }
+    @catch (NSException *exception) {
+        reject(@"get_saved_signatures_failed", @"Failed to get saved signatures", [self errorFromException:exception]);
+    }
+}
+
+RCT_REMAP_METHOD(getSavedSignatureFolder,
+                 getSavedSignatureFolderForDocumentViewTag: (nonnull NSNumber *)tag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    @try {
+        NSString *folder = [[self documentViewManager] getSavedSignatureFolderForDocumentViewTag:tag];
+        resolve(folder);
+    }
+    @catch (NSException *exception) {
+        reject(@"get_saved_signature_folder_failed", @"Failed to get saved signatures folder", [self errorFromException:exception]);
     }
 }
 

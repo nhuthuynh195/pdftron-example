@@ -24,7 +24,7 @@
         android:exported="true"
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustPan"
-        android:theme="@style/CustomPDFTronAppTheme">
+        android:theme="@style/LuminAppTheme">
         
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />

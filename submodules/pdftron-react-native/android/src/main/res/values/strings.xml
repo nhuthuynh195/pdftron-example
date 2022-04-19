@@ -2,5 +2,9 @@
 <resources>
     <string name="action_outline">Bookmarks</string>
     <string name="action_thumbnails">Pages</string>
+    <!-- <string name="action_reflow_mode">Reading mode</string> -->
     <string name="action_search">Search</string>
+		<string name="action_commentsList">Comments List</string>
+		<string name="action_notesList">Notes List</string>
+		<string name="action_moreButton">More Button</string>
 </resources>
